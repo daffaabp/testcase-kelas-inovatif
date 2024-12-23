@@ -25,17 +25,17 @@ import { SidebarContext } from '@/context/sidebar-context'
 const menuItems = [
     {
         title: 'Home',
-        href: '/home',
+        href: '/dashboard',
         icon: Home
     },
     {
         title: 'My Library',
-        href: '/library',
+        href: '/dashboard/library',
         icon: Library,
         submenu: [
             {
                 title: 'My Notebooks',
-                href: '/library/notebooks',
+                href: '/dashboard/library/notebooks',
                 icon: FileText
             }
         ]
