@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { 
+import {
     Home,
     Library,
     FileText,
@@ -25,17 +25,17 @@ import { SidebarContext } from '@/context/sidebar-context'
 const menuItems = [
     {
         title: 'Home',
-        href: '/dashboard',
+        href: '/home',
         icon: Home
     },
     {
         title: 'My Library',
-        href: '/dashboard/library',
+        href: '/library',
         icon: Library,
         submenu: [
             {
                 title: 'My Notebooks',
-                href: '/dashboard/library/notebooks',
+                href: '/library/notebooks',
                 icon: FileText
             }
         ]
