@@ -18,8 +18,12 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(redirectUrl)
     }
 
-    // Jika user sudah login dan mencoba mengakses halaman login/register
-    if (session && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
+    // Jika user sudah login dan mencoba mengakses halaman auth
+    if (session && (
+        request.nextUrl.pathname === '/login' || 
+        request.nextUrl.pathname === '/register' ||
+        request.nextUrl.pathname === '/forgot-password'
+    )) {
         return NextResponse.redirect(new URL('/home', request.url))
     }
 
@@ -27,5 +31,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/dashboard/:path*', '/home/:path*', '/login', '/register']
+    matcher: [
+        '/dashboard/:path*', 
+        '/home/:path*', 
+        '/login', 
+        '/register',
+        '/forgot-password',
+        '/reset-password'
+    ]
 }

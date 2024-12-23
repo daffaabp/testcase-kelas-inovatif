@@ -5,9 +5,17 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { Loader2 } from "lucide-react"
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -40,59 +48,81 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <Card className="w-[400px]">
-                <CardHeader>
-                    <CardTitle>Login</CardTitle>
-                    <CardDescription>
-                        Masuk ke akun Anda untuk melanjutkan
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        {error && (
-                            <div className="p-3 text-sm text-red-500 bg-red-100 rounded">
-                                {error}
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+            <div className="w-full max-w-[400px]">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-2xl">Login</CardTitle>
+                        <CardDescription>
+                            Enter your email below to login to your account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleLogin}>
+                            <div className="flex flex-col gap-6">
+                                {error && (
+                                    <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                                        {error}
+                                    </div>
+                                )}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="m@example.com"
+                                        required
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="password">Password</Label>
+                                        <Link
+                                            href="/forgot-password"
+                                            className="text-sm text-blue-600 hover:underline"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </div>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        placeholder="Enter your password"
+                                        required
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <Button type="submit" className="w-full" disabled={loading}>
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Signing in...
+                                        </>
+                                    ) : (
+                                        'Sign in'
+                                    )}
+                                </Button>
+                                <Button variant="outline" className="w-full" disabled={loading}>
+                                    Continue with Google
+                                </Button>
                             </div>
-                        )}
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="nama@email.com"
-                                required
-                                disabled={loading}
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Masukkan password"
-                                required
-                                disabled={loading}
-                            />
-                        </div>
-                        <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? 'Loading...' : 'Login'}
-                        </Button>
-                    </form>
-                </CardContent>
-                <CardFooter className="flex justify-center">
-                    <p className="text-sm text-muted-foreground">
-                        Belum punya akun?{' '}
-                        <Link href="/register" className="text-primary hover:underline">
-                            Register
-                        </Link>
-                    </p>
-                </CardFooter>
-            </Card>
+                        </form>
+                    </CardContent>
+                    <CardFooter>
+                        <p className="text-center text-sm text-gray-600 w-full">
+                            Don't have an account?{' '}
+                            <Link href="/register" className="text-blue-600 hover:underline">
+                                Sign up
+                            </Link>
+                        </p>
+                    </CardFooter>
+                </Card>
+            </div>
         </div>
     )
 }

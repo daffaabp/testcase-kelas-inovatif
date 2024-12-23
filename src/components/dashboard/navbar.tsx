@@ -20,6 +20,7 @@ interface UserProfile {
     email?: string;
     full_name?: string;
     avatar_url?: string;
+    display_name?: string;
 }
 
 export default function Navbar() {
@@ -34,17 +35,20 @@ export default function Navbar() {
                 const { data: { user } } = await supabase.auth.getUser()
 
                 if (user) {
-                    // Mengambil data profil dari tabel profiles (sesuaikan dengan struktur database Anda)
                     const { data: profile } = await supabase
                         .from('profiles')
                         .select('*')
                         .eq('id', user.id)
                         .single()
 
+                    // Mengatur display name berdasarkan prioritas
+                    const displayName = profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0]
+
                     setUserProfile({
                         email: user.email,
-                        full_name: profile?.full_name || user.email?.split('@')[0],
-                        avatar_url: profile?.avatar_url
+                        full_name: profile?.full_name || user.user_metadata?.full_name,
+                        avatar_url: profile?.avatar_url,
+                        display_name: displayName
                     })
                 }
             } catch (error) {
@@ -65,17 +69,16 @@ export default function Navbar() {
         }
     }
 
-    // Mendapatkan inisial dari nama atau email
     const getInitials = () => {
-        if (userProfile?.full_name) {
-            return userProfile.full_name
+        if (userProfile?.display_name) {
+            return userProfile.display_name
                 .split(' ')
                 .map(name => name[0])
                 .join('')
                 .toUpperCase()
                 .slice(0, 2)
         }
-        return userProfile?.email?.substring(0, 2).toUpperCase() || 'U'
+        return 'U'
     }
 
     return (
@@ -115,7 +118,7 @@ export default function Navbar() {
                             {userProfile?.avatar_url ? (
                                 <Image
                                     src={userProfile.avatar_url}
-                                    alt="Profile"
+                                    alt={userProfile.display_name || 'Profile'}
                                     width={32}
                                     height={32}
                                     className="rounded-full"
@@ -128,17 +131,22 @@ export default function Navbar() {
                                 </div>
                             )}
                             <div className="hidden md:block text-left">
-                                <p className="text-sm font-medium">
-                                    {userProfile?.full_name || userProfile?.email?.split('@')[0]}
+                                <p className="text-sm font-medium line-clamp-1">
+                                    {userProfile?.display_name}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 line-clamp-1">
                                     {userProfile?.email}
                                 </p>
                             </div>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                            <div className="flex flex-col space-y-1">
+                                <p className="text-sm font-medium">{userProfile?.display_name}</p>
+                                <p className="text-xs font-normal text-gray-500">{userProfile?.email}</p>
+                            </div>
+                        </DropdownMenuLabel>
                         <DropdownMenuItem>
                             Profile Settings
                         </DropdownMenuItem>
