@@ -12,7 +12,9 @@ export async function middleware(request: NextRequest) {
 
     // Jika user tidak login dan mencoba mengakses dashboard
     if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        const redirectUrl = new URL('/login', request.url)
+        redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
+        return NextResponse.redirect(redirectUrl)
     }
 
     // Jika user sudah login dan mencoba mengakses halaman login/register
