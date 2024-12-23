@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -14,6 +15,7 @@ export default function Login() {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
+    const supabase = createClientComponentClient()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -21,24 +23,15 @@ export default function Login() {
         setLoading(true)
 
         try {
-            const res = await fetch('/api/auth/signIn', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
             })
 
-            const data = await res.json()
+            if (error) throw error
 
-            if (!res.ok) {
-                throw new Error(data.error || 'Login gagal')
-            }
-
-            // Jika berhasil, redirect ke dashboard
             router.push('/dashboard')
             router.refresh()
-
         } catch (err: any) {
             setError(err.message)
         } finally {

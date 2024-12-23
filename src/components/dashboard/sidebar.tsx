@@ -1,12 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, Users, Settings, LogOut } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { LayoutDashboard, FileText, Users, Settings, LogOut } from 'lucide-react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const menuItems = [
     {
@@ -15,8 +14,13 @@ const menuItems = [
         icon: LayoutDashboard
     },
     {
-        title: 'Users',
-        href: '/dashboard/users',
+        title: 'Documents',
+        href: '/dashboard/documents',
+        icon: FileText
+    },
+    {
+        title: 'Team',
+        href: '/dashboard/team',
         icon: Users
     },
     {
@@ -29,30 +33,38 @@ const menuItems = [
 export default function Sidebar() {
     const pathname = usePathname()
     const router = useRouter()
+    const supabase = createClientComponentClient()
 
     const handleSignOut = async () => {
-        await supabase.auth.signOut()
-        router.push('/login')
+        try {
+            await supabase.auth.signOut()
+            router.push('/login')
+            router.refresh()
+        } catch (error) {
+            console.error('Error signing out:', error)
+        }
     }
 
     return (
-        <div className="flex h-full w-64 flex-col border-r bg-muted/40">
-            <div className="p-6">
-                <h1 className="text-2xl font-bold">Admin Panel</h1>
+        <div className="flex h-full w-72 flex-col border-r bg-white">
+            <div className="p-6 border-b">
+                <h1 className="text-xl font-semibold text-blue-600">Typeset</h1>
             </div>
 
-            <div className="flex-1 px-4">
-                <nav className="space-y-2">
+            <div className="flex-1 px-4 py-6">
+                <nav className="space-y-1">
                     {menuItems.map((item) => (
                         <Link key={item.href} href={item.href}>
                             <Button
                                 variant="ghost"
                                 className={cn(
-                                    'w-full justify-start',
-                                    pathname === item.href && 'bg-muted'
+                                    'w-full justify-start h-11 px-4',
+                                    pathname === item.href
+                                        ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                                        : 'text-gray-600 hover:bg-gray-50'
                                 )}
                             >
-                                <item.icon className="mr-2 h-4 w-4" />
+                                <item.icon className="mr-3 h-5 w-5" />
                                 {item.title}
                             </Button>
                         </Link>
@@ -60,14 +72,14 @@ export default function Sidebar() {
                 </nav>
             </div>
 
-            <div className="p-4">
+            <div className="p-4 border-t">
                 <Button
                     variant="ghost"
-                    className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-100"
+                    className="w-full justify-start h-11 text-gray-600 hover:bg-gray-50"
                     onClick={handleSignOut}
                 >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    <LogOut className="mr-3 h-5 w-5" />
+                    Sign Out
                 </Button>
             </div>
         </div>
