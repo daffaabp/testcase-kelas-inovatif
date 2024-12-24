@@ -10,21 +10,30 @@ export async function middleware(request: NextRequest) {
         data: { session },
     } = await supabase.auth.getSession()
 
-    // Jika user tidak login dan mencoba mengakses protected routes
-    if (!session && (request.nextUrl.pathname.startsWith('/dashboard') || 
-                    request.nextUrl.pathname.startsWith('/home'))) {
+    // Auth routes yang tidak memerlukan session
+    const publicAuthRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
+    
+    // Protected routes yang memerlukan session
+    const protectedRoutes = ['/dashboard', '/home']
+
+    const isAuthRoute = publicAuthRoutes.some(route => 
+        request.nextUrl.pathname.startsWith(route)
+    )
+    
+    const isProtectedRoute = protectedRoutes.some(route => 
+        request.nextUrl.pathname.startsWith(route)
+    )
+
+    // Redirect ke login jika mencoba akses protected route tanpa session
+    if (!session && isProtectedRoute) {
         const redirectUrl = new URL('/login', request.url)
         redirectUrl.searchParams.set('redirect', request.nextUrl.pathname)
         return NextResponse.redirect(redirectUrl)
     }
 
-    // Jika user sudah login dan mencoba mengakses halaman auth
-    if (session && (
-        request.nextUrl.pathname === '/login' || 
-        request.nextUrl.pathname === '/register' ||
-        request.nextUrl.pathname === '/forgot-password'
-    )) {
-        return NextResponse.redirect(new URL('/home', request.url))
+    // Redirect ke dashboard jika sudah login tapi mencoba akses auth routes
+    if (session && isAuthRoute) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     return res
@@ -32,11 +41,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/dashboard/:path*', 
-        '/home/:path*', 
-        '/login', 
+        '/dashboard/:path*',
+        '/home/:path*',
+        '/login',
         '/register',
         '/forgot-password',
-        '/reset-password'
+        '/reset-password',
+        '/auth/callback'
     ]
 }
