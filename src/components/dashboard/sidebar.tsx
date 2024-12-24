@@ -24,17 +24,17 @@ const menuItems = [
     },
     {
         title: 'Blog',
-        href: '/blog',
+        href: '/dashboard/blog',
         icon: MessageSquare,
         submenu: [
             {
                 title: 'All Posts',
-                href: '/blog',
+                href: '/dashboard/blog',
                 icon: BookOpen
             },
             {
                 title: 'Create Post',
-                href: '/blog/add',
+                href: '/dashboard/blog/create-post',
                 icon: Pencil
             }
         ]
