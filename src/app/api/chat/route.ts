@@ -11,30 +11,34 @@ export async function POST(req: Request) {
     model: openai('gpt-4o'),
     messages,
     tools: {
-      weather: tool({
-        description: 'Get the weather in a location (fahrenheit)',
+      generateBlogIdeas: tool({
+        description: 'Generate blog post ideas based on a topic',
         parameters: z.object({
-          location: z.string().describe('The location to get the weather for'),
+          topic: z.string().describe('The main topic to generate blog ideas for'),
+          count: z.number().min(1).max(5).describe('Number of ideas to generate'),
         }),
-        execute: async ({ location }) => {
-          const temperature = Math.round(Math.random() * (90 - 32) + 32);
+        execute: async ({ topic, count }) => {
           return {
-            location,
-            temperature,
+            ideas: Array(count).fill(null).map((_, i) => ({
+              title: `Sample Blog Idea ${i + 1} for ${topic}`,
+              description: `This is a sample description for a blog post about ${topic}`
+            }))
           };
         },
       }),
-      convertFahrenheitToCelsius: tool({
-        description: 'Convert a temperature in fahrenheit to celsius',
+      analyzeBlogContent: tool({
+        description: 'Analyze blog content and suggest improvements',
         parameters: z.object({
-          temperature: z
-            .number()
-            .describe('The temperature in fahrenheit to convert'),
+          content: z.string().describe('The blog content to analyze'),
         }),
-        execute: async ({ temperature }) => {
-          const celsius = Math.round((temperature - 32) * (5 / 9));
+        execute: async ({ content }) => {
           return {
-            celsius,
+            wordCount: content.split(' ').length,
+            suggestions: [
+              'Add more specific examples',
+              'Include relevant statistics',
+              'Consider adding subheadings'
+            ]
           };
         },
       }),

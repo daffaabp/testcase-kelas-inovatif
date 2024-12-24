@@ -40,9 +40,9 @@ const menuItems = [
         ]
     },
     {
-        title: 'AI Writer',
-        href: '/dashboard/writer',
-        icon: Pencil
+        title: 'Chatting',
+        href: '/dashboard/chatting',
+        icon: MessageSquare
     },
 ]
 
