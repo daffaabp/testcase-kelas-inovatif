@@ -29,26 +29,14 @@ const menuItems = [
         icon: Home
     },
     {
-        title: 'My Library',
-        href: '/dashboard/library',
-        icon: Library,
-        submenu: [
-            {
-                title: 'My Notebooks',
-                href: '/dashboard/library/notebooks',
-                icon: FileText
-            }
-        ]
+        title: 'Blogs',
+        href: '/dashboard/blogs',
+        icon: MessageSquare
     },
     {
         title: 'My Profile',
         href: '/dashboard/profile',
         icon: User2
-    },
-    {
-        title: 'Chat with PDF',
-        href: '/dashboard/chat',
-        icon: MessageSquare
     },
     {
         title: 'Literature Review',
