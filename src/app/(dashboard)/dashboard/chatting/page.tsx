@@ -1,6 +1,7 @@
 'use client';
 
 import { useChat } from 'ai/react';
+import Image from 'next/image';
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,9 +14,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function Chat() {
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-        maxSteps: 5,
-    });
+    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat();
 
     return (
         <div className="flex flex-col h-[calc(100vh-4rem)]">
@@ -49,9 +48,24 @@ export default function Chat() {
                                         )}
                                     >
                                         {message.toolInvocations ? (
-                                            <pre className="whitespace-pre-wrap text-sm">
-                                                {JSON.stringify(message.toolInvocations, null, 2)}
-                                            </pre>
+                                            message.toolInvocations.map(ti =>
+                                                ti.toolName === 'generateImage' ? (
+                                                    ti.state === 'result' ? (
+                                                        <Image
+                                                            key={ti.toolCallId}
+                                                            src={`data:image/png;base64,${ti.result.image}`}
+                                                            alt={ti.result.prompt}
+                                                            height={400}
+                                                            width={400}
+                                                            className="rounded-lg"
+                                                        />
+                                                    ) : (
+                                                        <div key={ti.toolCallId} className="animate-pulse">
+                                                            Generating image...
+                                                        </div>
+                                                    )
+                                                ) : null
+                                            )
                                         ) : (
                                             <p className="whitespace-pre-wrap">{message.content}</p>
                                         )}

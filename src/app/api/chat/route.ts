@@ -1,49 +1,41 @@
 import { openai } from '@ai-sdk/openai';
-import { streamText, tool } from 'ai';
+import { experimental_generateImage, Message, streamText, tool } from 'ai';
 import { z } from 'zod';
 
-export const maxDuration = 30;
+export async function POST(request: Request) {
+  const { messages }: { messages: Message[] } = await request.json();
 
-export async function POST(req: Request) {
-  const { messages } = await req.json();
+  // filter through messages and remove base64 image data to avoid sending to the model
+  const formattedMessages = messages.map(m => {
+    if (m.role === 'assistant' && m.toolInvocations) {
+      m.toolInvocations.forEach(ti => {
+        if (ti.toolName === 'generateImage' && ti.state === 'result') {
+          ti.result.image = `redacted-for-length`;
+        }
+      });
+    }
+    return m;
+  });
 
   const result = streamText({
     model: openai('gpt-4o'),
-    messages,
+    messages: formattedMessages,
     tools: {
-      generateBlogIdeas: tool({
-        description: 'Generate blog post ideas based on a topic',
+      generateImage: tool({
+        description: 'Generate an image',
         parameters: z.object({
-          topic: z.string().describe('The main topic to generate blog ideas for'),
-          count: z.number().min(1).max(5).describe('Number of ideas to generate'),
+          prompt: z.string().describe('The prompt to generate the image from'),
         }),
-        execute: async ({ topic, count }) => {
-          return {
-            ideas: Array(count).fill(null).map((_, i) => ({
-              title: `Sample Blog Idea ${i + 1} for ${topic}`,
-              description: `This is a sample description for a blog post about ${topic}`
-            }))
-          };
-        },
-      }),
-      analyzeBlogContent: tool({
-        description: 'Analyze blog content and suggest improvements',
-        parameters: z.object({
-          content: z.string().describe('The blog content to analyze'),
-        }),
-        execute: async ({ content }) => {
-          return {
-            wordCount: content.split(' ').length,
-            suggestions: [
-              'Add more specific examples',
-              'Include relevant statistics',
-              'Consider adding subheadings'
-            ]
-          };
+        execute: async ({ prompt }) => {
+          const { image } = await experimental_generateImage({
+            model: openai.image('dall-e-3'),
+            prompt,
+          });
+          // in production, save this image to blob storage and return a URL
+          return { image: image.base64, prompt };
         },
       }),
     },
   });
-
   return result.toDataStreamResponse();
 }
