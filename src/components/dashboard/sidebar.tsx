@@ -1,18 +1,16 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
     Home,
-    User2,
     MessageSquare,
     Pencil,
     ChevronLeft,
     BookOpen
 } from 'lucide-react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useContext } from 'react'
 import { SidebarContext } from '@/context/sidebar-context'
 
@@ -48,19 +46,7 @@ const menuItems = [
 
 export default function Sidebar() {
     const pathname = usePathname()
-    const router = useRouter()
-    const supabase = createClientComponentClient()
     const { isOpen, toggleSidebar } = useContext(SidebarContext)
-
-    const handleSignOut = async () => {
-        try {
-            await supabase.auth.signOut()
-            router.push('/login')
-            router.refresh()
-        } catch (error) {
-            console.error('Error signing out:', error)
-        }
-    }
 
     return (
         <div className={cn(

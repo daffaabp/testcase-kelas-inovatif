@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -17,10 +16,12 @@ import { Label } from "@/components/ui/label"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Loader2, ArrowLeft, Mail, CheckCircle2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { forgotPasswordSchema } from '@/lib/validations/auth'
+import * as z from 'zod'
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('')
-    const [error, setError] = useState('')
+    const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const router = useRouter()
@@ -28,19 +29,31 @@ export default function ForgotPassword() {
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError('')
+        setError(null)
         setLoading(true)
 
         try {
-            const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`,
-            })
+            // Validasi email menggunakan Zod
+            const validatedData = forgotPasswordSchema.parse({ email })
 
-            if (error) throw error
+            const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+                validatedData.email,
+                {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                }
+            )
+
+            if (resetError) throw resetError
 
             setSuccess(true)
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message)
+            } else if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('Terjadi kesalahan yang tidak diketahui')
+            }
         } finally {
             setLoading(false)
         }
@@ -54,10 +67,10 @@ export default function ForgotPassword() {
                         <CardHeader>
                             <div className="flex items-center gap-2">
                                 <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                <CardTitle className="text-2xl">Check your email</CardTitle>
+                                <CardTitle className="text-2xl">Periksa email Anda</CardTitle>
                             </div>
                             <CardDescription>
-                                We've sent a password reset link to your email
+                                Kami telah mengirim link reset password ke email Anda
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
@@ -66,8 +79,8 @@ export default function ForgotPassword() {
                                 <p>{email}</p>
                             </div>
                             <p className="text-sm text-gray-600">
-                                Click the link in the email to reset your password. The link will expire in 1 hour.
-                                If you don't see the email, check your spam folder.
+                                Klik link di email untuk mereset password Anda. Link akan kadaluarsa dalam 1 jam.
+                                Jika Anda tidak melihat email, periksa folder spam.
                             </p>
                         </CardContent>
                         <CardFooter className="flex flex-col gap-4">
@@ -76,15 +89,15 @@ export default function ForgotPassword() {
                                 className="w-full"
                                 onClick={() => router.push('/login')}
                             >
-                                Back to login
+                                Kembali ke login
                             </Button>
                             <p className="text-sm text-gray-600 text-center">
-                                Didn't receive the email?{' '}
+                                Tidak menerima email?{' '}
                                 <button
                                     onClick={() => setSuccess(false)}
                                     className="text-blue-600 hover:underline"
                                 >
-                                    Try again
+                                    Coba lagi
                                 </button>
                             </p>
                         </CardFooter>
@@ -99,9 +112,9 @@ export default function ForgotPassword() {
             <div className="w-full max-w-[400px]">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-2xl">Forgot password?</CardTitle>
+                        <CardTitle className="text-2xl">Lupa password?</CardTitle>
                         <CardDescription>
-                            Enter your email address and we'll send you a link to reset your password
+                            Masukkan email Anda dan kami akan mengirimkan link untuk reset password
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -113,13 +126,13 @@ export default function ForgotPassword() {
                                     </Alert>
                                 )}
                                 <div className="grid gap-2">
-                                    <Label htmlFor="email">Email address</Label>
+                                    <Label htmlFor="email">Alamat Email</Label>
                                     <Input
                                         id="email"
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="Enter your email"
+                                        placeholder="nama@email.com"
                                         required
                                         disabled={loading}
                                     />
@@ -128,10 +141,10 @@ export default function ForgotPassword() {
                                     {loading ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Sending reset link...
+                                            Mengirim link reset...
                                         </>
                                     ) : (
-                                        'Send reset link'
+                                        'Kirim link reset'
                                     )}
                                 </Button>
                             </div>
@@ -144,7 +157,7 @@ export default function ForgotPassword() {
                             onClick={() => router.push('/login')}
                         >
                             <ArrowLeft className="h-4 w-4" />
-                            Back to login
+                            Kembali ke login
                         </Button>
                     </CardFooter>
                 </Card>

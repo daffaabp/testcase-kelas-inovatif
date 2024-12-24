@@ -46,8 +46,6 @@ export default function ListBlog() {
                 } else if (result.data) {
                     setBlogs(result.data)
                 }
-            } catch (err) {
-                setError('Terjadi kesalahan saat mengambil data blog')
             } finally {
                 setLoading(false)
             }

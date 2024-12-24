@@ -16,6 +16,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Loader2, AlertCircle, Check } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/validations/auth'
+import * as z from "zod"
 
 export default function ResetPassword() {
     const [formData, setFormData] = useState<ResetPasswordInput>({
@@ -64,8 +65,14 @@ export default function ResetPassword() {
             setLoading(true)
 
             // Verifikasi password lama
+            const { data: { user } } = await supabase.auth.getUser()
+
+            if (!user?.email) {
+                throw new Error('Sesi tidak valid')
+            }
+
             const { error: signInError } = await supabase.auth.signInWithPassword({
-                email: (await supabase.auth.getUser()).data.user?.email || '',
+                email: user.email,
                 password: validatedData.currentPassword,
             })
 
@@ -81,18 +88,19 @@ export default function ResetPassword() {
             if (updateError) throw updateError
 
             setMessage('Password berhasil diubah')
-            
+
             // Redirect ke dashboard setelah 2 detik
             setTimeout(() => {
                 router.push('/dashboard')
             }, 2000)
 
-        } catch (err: any) {
-            if (err?.issues) {
-                // Zod validation error
-                setError(err.issues[0].message)
-            } else {
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message)
+            } else if (err instanceof Error) {
                 setError(err.message)
+            } else {
+                setError('Terjadi kesalahan yang tidak diketahui')
             }
         } finally {
             setLoading(false)
@@ -156,11 +164,10 @@ export default function ResetPassword() {
                                     />
                                     <ul className="text-sm text-gray-600 space-y-1 mt-2">
                                         {passwordChecks.map((check, index) => (
-                                            <li 
+                                            <li
                                                 key={index}
-                                                className={`flex items-center gap-2 ${
-                                                    check.passed ? 'text-green-600' : ''
-                                                }`}
+                                                className={`flex items-center gap-2 ${check.passed ? 'text-green-600' : ''
+                                                    }`}
                                             >
                                                 {check.passed ? (
                                                     <Check className="h-4 w-4" />

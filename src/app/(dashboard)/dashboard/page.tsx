@@ -2,9 +2,8 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, BookOpen, Filter, ArrowRight, Download, FileText } from "lucide-react"
+import { Search, BookOpen, Filter, FileText } from "lucide-react"
 import { Card } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 import { useState } from "react"
 
 const suggestedQueries = [

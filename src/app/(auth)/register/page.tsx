@@ -27,6 +27,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import * as z from 'zod'
 
 export default function Register() {
     const [error, setError] = useState<string | null>(null)
@@ -92,8 +93,14 @@ export default function Register() {
                 throw new Error('Registrasi gagal. Silakan coba lagi.')
             }
 
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message)
+            } else if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('Terjadi kesalahan yang tidak diketahui')
+            }
         }
     }
 

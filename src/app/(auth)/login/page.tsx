@@ -16,6 +16,8 @@ import {
 import { Label } from "@/components/ui/label"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Loader2 } from "lucide-react"
+import { loginSchema } from '@/lib/validations/auth'
+import * as z from 'zod'
 
 export default function Login() {
     const [email, setEmail] = useState('')
@@ -31,17 +33,26 @@ export default function Login() {
         setLoading(true)
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+            // Validasi form menggunakan Zod
+            const validatedData = loginSchema.parse({ email, password })
+
+            const { error: authError } = await supabase.auth.signInWithPassword({
+                email: validatedData.email,
+                password: validatedData.password,
             })
 
-            if (error) throw error
+            if (authError) throw authError
 
             router.push('/dashboard')
             router.refresh()
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message)
+            } else if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('Terjadi kesalahan yang tidak diketahui')
+            }
         } finally {
             setLoading(false)
         }
@@ -54,7 +65,7 @@ export default function Login() {
                     <CardHeader>
                         <CardTitle className="text-2xl">Login</CardTitle>
                         <CardDescription>
-                            Enter your email below to login to your account
+                            Masukkan email Anda untuk masuk ke akun
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -72,7 +83,7 @@ export default function Login() {
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        placeholder="m@example.com"
+                                        placeholder="nama@email.com"
                                         required
                                         disabled={loading}
                                     />
@@ -84,7 +95,7 @@ export default function Login() {
                                             href="/forgot-password"
                                             className="text-sm text-blue-600 hover:underline"
                                         >
-                                            Forgot password?
+                                            Lupa password?
                                         </Link>
                                     </div>
                                     <Input
@@ -92,7 +103,7 @@ export default function Login() {
                                         type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        placeholder="Enter your password"
+                                        placeholder="Masukkan password"
                                         required
                                         disabled={loading}
                                     />
@@ -101,23 +112,23 @@ export default function Login() {
                                     {loading ? (
                                         <>
                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Signing in...
+                                            Sedang masuk...
                                         </>
                                     ) : (
-                                        'Sign in'
+                                        'Masuk'
                                     )}
                                 </Button>
                                 <Button variant="outline" className="w-full" disabled={loading}>
-                                    Continue with Google
+                                    Lanjutkan dengan Google
                                 </Button>
                             </div>
                         </form>
                     </CardContent>
                     <CardFooter>
                         <p className="text-center text-sm text-gray-600 w-full">
-                            Don't have an account?{' '}
+                            Belum punya akun?{' '}
                             <Link href="/register" className="text-blue-600 hover:underline">
-                                Sign up
+                                Daftar
                             </Link>
                         </p>
                     </CardFooter>

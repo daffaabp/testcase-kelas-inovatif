@@ -8,7 +8,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Menu, Bell, User, Search } from "lucide-react"
+import { Menu, Bell, Search } from "lucide-react"
 import { useContext, useEffect, useState } from "react"
 import { SidebarContext } from "@/context/sidebar-context"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'

@@ -27,7 +27,10 @@ export async function createBlog(formData: FormData) {
     revalidatePath('/dashboard/blog')
     return { success: true }
 
-  } catch (error) {
+  } catch (err) {
+    if (err instanceof Error) {
+      return { error: err.message }
+    }
     return { error: 'Gagal membuat blog' }
   }
 }
@@ -56,7 +59,10 @@ export async function updateBlog(id: string, formData: FormData) {
     revalidatePath('/dashboard/blogs')
     return { success: true }
 
-  } catch (error) {
+  } catch (err) {
+    if (err instanceof Error) {
+      return { error: err.message }
+    }
     return { error: 'Gagal mengupdate blog' }
   }
 }
@@ -73,7 +79,10 @@ export async function deleteBlog(id: string) {
     revalidatePath('/dashboard/blogs')
     return { success: true }
 
-  } catch (error) {
+  } catch (err) {
+    if (err instanceof Error) {
+      return { error: err.message }
+    }
     return { error: 'Gagal menghapus blog' }
   }
 }
@@ -90,7 +99,10 @@ export async function getBlog(id: string) {
 
     return { data }
 
-  } catch (error) {
+  } catch (err) {
+    if (err instanceof Error) {
+      return { error: err.message }
+    }
     return { error: 'Gagal mendapatkan blog' }
   }
 }
@@ -106,7 +118,10 @@ export async function getBlogs() {
 
     return { data }
 
-  } catch (error) {
+  } catch (err) {
+    if (err instanceof Error) {
+      return { error: err.message }
+    }
     return { error: 'Gagal mendapatkan daftar blog' }
   }
 }

@@ -36,16 +36,17 @@ export const loginSchema = z.object({
 
 // Reset password schema
 export const resetPasswordSchema = z.object({
-    password: passwordValidation,
+    currentPassword: z.string().min(1, "Password lama harus diisi"),
+    password: z.string()
+        .min(8, "Password minimal 8 karakter")
+        .regex(/[a-z]/, "Password harus mengandung huruf kecil")
+        .regex(/[A-Z]/, "Password harus mengandung huruf besar")
+        .regex(/\d/, "Password harus mengandung angka")
+        .regex(/[!@#$%^&*]/, "Password harus mengandung karakter spesial (!@#$%^&*)"),
     confirmPassword: z.string()
-}).superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password tidak cocok",
-            path: ["confirmPassword"]
-        });
-    }
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Password tidak cocok",
+    path: ["confirmPassword"]
 })
 
 // Forgot password schema

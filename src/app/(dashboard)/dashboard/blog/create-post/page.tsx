@@ -1,12 +1,10 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBlog } from '../server-action'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useAlert } from '@/hooks/use-sweet-alert'
 import { ArrowLeft } from 'lucide-react'
