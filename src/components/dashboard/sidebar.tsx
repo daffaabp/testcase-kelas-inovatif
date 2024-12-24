@@ -24,17 +24,17 @@ const menuItems = [
     },
     {
         title: 'Blog',
-        href: '/dashboard/blog',
+        href: '/blog',
         icon: MessageSquare,
         submenu: [
             {
                 title: 'All Posts',
-                href: '/dashboard/blog',
+                href: '/blog',
                 icon: BookOpen
             },
             {
                 title: 'Create Post',
-                href: '/dashboard/blog/add',
+                href: '/blog/add',
                 icon: Pencil
             }
         ]
@@ -72,7 +72,7 @@ export default function Sidebar() {
                     "text-xl font-semibold text-blue-600 transition-all duration-300",
                     !isOpen && "opacity-0"
                 )}>
-                    Scispace
+                    Testing
                 </h1>
                 <Button
                     variant="ghost"

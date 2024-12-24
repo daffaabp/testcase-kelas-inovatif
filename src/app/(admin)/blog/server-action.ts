@@ -9,14 +9,12 @@ export async function createBlog(formData: FormData) {
     const title = formData.get('title') as string
     const content = formData.get('content') as string 
     const imageUrl = formData.get('image_url') as string
-    const authorId = formData.get('author_id') as string
     const published = formData.get('published') === 'true'
 
     const validatedData = createBlogSchema.parse({
       title,
       content,
       image_url: imageUrl,
-      author_id: authorId,
       published
     })
 
@@ -26,7 +24,7 @@ export async function createBlog(formData: FormData) {
 
     if (error) throw error
 
-    revalidatePath('/dashboard/blogs')
+    revalidatePath('/dashboard/blog')
     return { success: true }
 
   } catch (error) {
