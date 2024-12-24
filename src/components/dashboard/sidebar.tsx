@@ -6,17 +6,11 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
     Home,
-    Library,
-    FileText,
     User2,
     MessageSquare,
-    Search,
     Pencil,
-    Quote,
-    Zap,
-    Languages,
-    FileVideo,
-    ChevronLeft
+    ChevronLeft,
+    BookOpen
 } from 'lucide-react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useContext } from 'react'
@@ -29,55 +23,27 @@ const menuItems = [
         icon: Home
     },
     {
-        title: 'Blogs',
-        href: '/dashboard/blogs',
-        icon: MessageSquare
-    },
-    {
-        title: 'My Profile',
-        href: '/dashboard/profile',
-        icon: User2
-    },
-    {
-        title: 'Literature Review',
-        href: '/dashboard/literature',
-        icon: Search
+        title: 'Blog',
+        href: '/dashboard/blog',
+        icon: MessageSquare,
+        submenu: [
+            {
+                title: 'All Posts',
+                href: '/dashboard/blog',
+                icon: BookOpen
+            },
+            {
+                title: 'Create Post',
+                href: '/dashboard/blog/add',
+                icon: Pencil
+            }
+        ]
     },
     {
         title: 'AI Writer',
         href: '/dashboard/writer',
         icon: Pencil
     },
-    {
-        title: 'Find Topics',
-        href: '/dashboard/topics',
-        icon: Search
-    },
-    {
-        title: 'Paraphraser',
-        href: '/dashboard/paraphrase',
-        icon: Quote
-    },
-    {
-        title: 'Citation Generator',
-        href: '/dashboard/citation',
-        icon: Quote
-    },
-    {
-        title: 'Extract Data',
-        href: '/dashboard/extract',
-        icon: Zap
-    },
-    {
-        title: 'AI Detector',
-        href: '/dashboard/detector',
-        icon: Languages
-    },
-    {
-        title: 'PDF to Video',
-        href: '/dashboard/pdf-to-video',
-        icon: FileVideo
-    }
 ]
 
 export default function Sidebar() {
@@ -130,7 +96,7 @@ export default function Sidebar() {
                                     variant="ghost"
                                     className={cn(
                                         'w-full justify-start h-10 px-2',
-                                        pathname === item.href
+                                        (pathname === item.href || pathname.startsWith(item.href + '/'))
                                             ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                                             : 'text-gray-600 hover:bg-gray-50'
                                     )}
