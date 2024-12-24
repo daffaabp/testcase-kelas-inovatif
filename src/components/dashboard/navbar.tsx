@@ -11,7 +11,7 @@ import {
 import { Menu, Bell, Search } from "lucide-react"
 import { useContext, useEffect, useState } from "react"
 import { SidebarContext } from "@/context/sidebar-context"
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClientComponentClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import { Input } from "@/components/ui/input"
 import Image from 'next/image'

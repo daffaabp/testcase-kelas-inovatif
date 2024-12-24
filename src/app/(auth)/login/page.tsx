@@ -14,7 +14,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClientComponentClient } from '@supabase/ssr'
 import { Loader2 } from "lucide-react"
 import { loginSchema } from '@/lib/validations/auth'
 import * as z from 'zod'
